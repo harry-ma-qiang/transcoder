@@ -1,0 +1,50 @@
+*{
+     margin:0;
+     padding:0;
+     font-size: 16px;
+}
+ body {
+     background-color: rgb(65, 65, 65);
+}
+ h3 {
+     width: 100%;
+     text-align: center;
+     color: rgb(255, 255, 255);
+     font-size: 30px;
+}
+ .job_div {
+     float: left;
+     margin-top: 20px;
+     margin-left: 1vw;
+     border: 1px solid rgb(255, 255, 255);
+     border-collapse: collapse;
+     background-color: rgb(192, 192, 192);
+     margin-right: 2vw;
+     min-width: 220px;
+}
+ .field_div {
+     height: auto;
+     line-height: 50px;
+     padding-left: 5px;
+}
+ input[type="button"] {
+     width: 60px;
+     height:30px;
+     border-radius: 4px;
+}
+ .job_div div {
+     border: 1px solid rgb(255, 255, 255);
+}
+ input[type="text"]{
+     width:85%;
+}
+ #api{
+     width:100%;
+     margin:auto;
+     word-wrap: break-word;
+}
+ .container {
+     display: grid;
+     grid-gap: 10px;
+     grid-template-columns: repeat(auto-fit, minmax(335px, 1fr));
+}

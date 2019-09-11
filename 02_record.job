@@ -1,0 +1,13 @@
+{
+  "service": "encode",
+  "name": "record",
+  "config": "/dev/shm/api/api/02_record.job",
+  "status": "/dev/shm/api/api/02_record.state",
+  "input": "udp://224.0.0.0:10000",
+  "output": "index.m3u8",
+  "videoCodec": "copy",
+  "audioCodec": "copy",
+  "format": "hls",
+  "enable": "0",
+  "version": "0"
+}

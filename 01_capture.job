@@ -1,0 +1,12 @@
+{
+  "service": "capture",
+  "name": "capture",
+  "config": "/dev/shm/api/api/01_capture.job",
+  "status": "/dev/shm/api/api/01_capture.state",
+  "output": "udp://224.0.0.0:10000",
+  "videoSize": "1280x720",
+  "videoBitrate": "2500",
+  "format": "mpegts",
+  "enable": "1",
+  "version": "0"
+}

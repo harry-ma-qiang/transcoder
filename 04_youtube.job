@@ -1,0 +1,13 @@
+{
+  "service": "encode",
+  "name": "youtube",
+  "config": "/dev/shm/api/api/04_youtube.job",
+  "status": "/dev/shm/api/api/04_youtube.state",
+  "input": "udp://224.0.0.0:10000",
+  "output": "rtmp://a.rtmp.youtube.com/live2/w764-9k6w-8bp8-asff",
+  "videoCodec": "copy",
+  "audioCodec": "copy",
+  "format": "flv",
+  "enable": "0",
+  "version": "0"
+}

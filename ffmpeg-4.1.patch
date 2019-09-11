@@ -1,0 +1,112 @@
+diff -ruN '--exclude=build' ../ffmpeg-4.1-origin/fftools/Makefile ./fftools/Makefile
+--- ../ffmpeg-4.1-origin/fftools/Makefile	2018-11-03 00:17:28.000000000 +0000
++++ ./fftools/Makefile	2019-09-10 23:22:06.833428370 +0000
+@@ -10,6 +10,10 @@
+ ALLAVPROGS_G = $(AVBASENAMES:%=%$(PROGSSUF)_g$(EXESUF))
+ 
+ OBJS-ffmpeg                        += fftools/ffmpeg_opt.o fftools/ffmpeg_filter.o fftools/ffmpeg_hw.o
++# @CHANGE By Harry : Change FFmpeg to API mode - Begin
++OBJS-ffmpeg                        += ../../api.o ../../api_info.o ../../api_exit.o ../../api_log.o ../../api_opt.o
++OBJS-ffmpeg                        += ../../api_opt_cap.o ../../api_opt_enc.o
++# @CHANGE By Harry : Change FFmpeg to API mode - End
+ OBJS-ffmpeg-$(CONFIG_CUVID)        += fftools/ffmpeg_cuvid.o
+ OBJS-ffmpeg-$(CONFIG_LIBMFX)       += fftools/ffmpeg_qsv.o
+ ifndef CONFIG_VIDEOTOOLBOX
+diff -ruN '--exclude=build' ../ffmpeg-4.1-origin/fftools/ffmpeg.c ./fftools/ffmpeg.c
+--- ../ffmpeg-4.1-origin/fftools/ffmpeg.c	2018-11-05 23:22:25.000000000 +0000
++++ ./fftools/ffmpeg.c	2019-09-10 23:08:29.133140353 +0000
+@@ -475,6 +475,9 @@
+ 
+ static int decode_interrupt_cb(void *ctx)
+ {
++    // @CHANGE By Harry : Change FFmpeg to API mode - Begin
++    if( api_decode_interrupt_cb() ) return 1;
++    // @CHANGE By Harry : Change FFmpeg to API mode - End
+     return received_nb_signals > atomic_load(&transcode_init_done);
+ }
+ 
+@@ -631,6 +634,10 @@
+     }
+     term_exit();
+     ffmpeg_exited = 1;
++    
++    // @CHANGE By Harry : Change FFmpeg to API mode - Begin
++    api_exit(ret, received_sigterm, transcode_init_done, main_return_code);
++    // @CHANGE By Harry : Change FFmpeg to API mode - End
+ }
+ 
+ void remove_avoptions(AVDictionary **a, AVDictionary *b)
+@@ -1495,6 +1502,10 @@
+             //if (ost->source_index >= 0)
+             //    *filtered_frame= *input_streams[ost->source_index]->decoded_frame; //for me_threshold
+ 
++            // @CHANGE By Harry : Change FFmpeg to API mode - Begin
++            api_frame(ost->enc_ctx, filtered_frame);
++            // @CHANGE By Harry : Change FFmpeg to API mode - End
++            
+             switch (av_buffersink_get_type(filter)) {
+             case AVMEDIA_TYPE_VIDEO:
+                 if (!ost->frame_aspect_ratio.num)
+@@ -1844,6 +1855,12 @@
+ 
+     if (is_last_report)
+         print_final_stats(total_size);
++    
++    // @CHANGE By Harry : Change FFmpeg to API mode - Begin
++    int64_t i_duration = (input_files && input_files[0] && input_files[0]->ctx) ? input_files[0]->ctx->duration : 0;
++    int64_t o_duration = (output_files && output_files[0] && output_files[0]->ctx) ? output_files[0]->ctx->duration : 0;
++    api_status(buf_script.str, pts, frame_number, total_size, i_duration, o_duration);
++    // @CHANGE By Harry : Change FFmpeg to API mode - End
+ }
+ 
+ static void ifilter_parameters_from_codecpar(InputFilter *ifilter, AVCodecParameters *par)
+@@ -3304,6 +3321,9 @@
+     AVFormatContext *oc = output_files[ost->file_index]->ctx;
+     int j, ret;
+ 
++    // @CHANGE by Harry - Remove encoder id - Begin
++    if (0)
++    // @CHANGE by Harry - Remove encoder id - End
+     set_encoder_id(output_files[ost->file_index], ost);
+ 
+     // Muxers use AV_PKT_DATA_DISPLAYMATRIX to signal rotation. On the other
+@@ -3832,6 +3852,12 @@
+     }
+ 
+     atomic_store(&transcode_init_done, 1);
++    
++    // @CHANGE By Harry : Change FFmpeg to API mode - Begin
++    if (input_files && input_files[0] && output_files && output_files[0]) {
++        api_init(input_files[0]->ctx, output_files[0]->ctx);
++    }
++    // @CHANGE By Harry : Change FFmpeg to API mode - End
+ 
+     return 0;
+ }
+@@ -4847,6 +4873,12 @@
+     init_dynload();
+ 
+     register_exit(ffmpeg_cleanup);
++    
++    // @CHANGE By Harry : Change FFmpeg to API mode - Begin
++    if (api_start(&argc, &argv) < 0) {
++        exit_program(1);
++    }
++    // @CHANGE By Harry : Change FFmpeg to API mode - End
+ 
+     setvbuf(stderr,NULL,_IONBF,0); /* win32 runtime needs this */
+ 
+diff -ruN '--exclude=build' ../ffmpeg-4.1-origin/fftools/ffmpeg.h ./fftools/ffmpeg.h
+--- ../ffmpeg-4.1-origin/fftools/ffmpeg.h	2018-11-05 23:22:25.000000000 +0000
++++ ./fftools/ffmpeg.h	2019-09-10 23:36:09.466273415 +0000
+@@ -46,6 +46,10 @@
+ 
+ #include "libswresample/swresample.h"
+ 
++// @CHANGE By Harry : Change FFmpeg to API mode - Begin
++#include "../../../api.h"
++// @CHANGE By Harry : Change FFmpeg to API mode - End
++
+ #define VSYNC_AUTO       -1
+ #define VSYNC_PASSTHROUGH 0
+ #define VSYNC_CFR         1

@@ -1,0 +1,13 @@
+{
+  "service": "encode",
+  "name": "facebook",
+  "config": "/dev/shm/api/api/03_facebook.job",
+  "status": "/dev/shm/api/api/03_facebook.state",
+  "input": "udp://224.0.0.0:10000",
+  "output": "rtmp://live-api.facebook.com/rtmp/2050267278345682?ds=1&s_sw=0&s_vt=api-s&a=AbxUcVutAPotxaR7",
+  "videoCodec": "copy",
+  "audioCodec": "copy",
+  "format": "flv",
+  "enable": "0",
+  "version": "0"
+}
