@@ -4,3 +4,4 @@ sample/
 bak/
 *.o
 *.d
+._*
