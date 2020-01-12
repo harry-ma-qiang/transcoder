@@ -20,8 +20,9 @@ typedef struct api {
     bool isGood;
     bool isLoop;
     bool enable;
+    int isDebug;
     int update;
-
+    string jobId;
     string config;
     string status;
     string notify;
@@ -46,7 +47,7 @@ typedef struct api {
 extern API api;
 
 int uploadLog();
-int updateStatus();
+int updateStatus(string url);
 int add_argv(const char*, int*, char***);
 int api_parse_options_capture(picojson::value, int*, char***);
 int api_parse_options_encode(picojson::value, int*, char***);

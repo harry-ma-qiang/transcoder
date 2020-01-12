@@ -11,6 +11,9 @@
 
 using namespace std;
 
+string dump_stream(AVStream* st);
+string dump_format(AVFormatContext* ctx);
+
 string dump_stream(AVStream* st) {
     stringstream info;
     info << std::fixed << std::setprecision(2);
@@ -85,11 +88,12 @@ string dump_format(AVFormatContext* ctx) {
 }
 
 int api_init(AVFormatContext* ictx, AVFormatContext* octx) {
-    api.mediaInfo = "{\"input\":" + dump_format(ictx);
-    api.mediaInfo += ", \"output\":" + dump_format(octx) + "}";
+    // api.mediaInfo = "{\"input\":" + dump_format(ictx);
+    // api.mediaInfo += ", \"output\":" + dump_format(octx) + "}";
+	api.mediaInfo = "{}";
 
     api.jobStatus = "doing";
-    updateStatus();
+    updateStatus(api.status +"/"+ api.jobId);
     pthread_create(&api.th_sync, NULL, sync, NULL);
 
     return 0;
@@ -131,7 +135,7 @@ int api_status(char* info, int64_t pts, int frame_number, int64_t total_size, in
 
     char* tmp = strdup(sstr.str().c_str());
     sstr.str("");
-    sstr << "{ ";
+    // sstr << "{ ";
     int one_end = 0;
     char * pch = strtok(tmp, "=\n");
     while (pch != NULL) {
@@ -143,7 +147,7 @@ int api_status(char* info, int64_t pts, int frame_number, int64_t total_size, in
             one_end = !one_end;
         }
     }
-    sstr << " }";
+    // sstr << " }";
     free(tmp);
 
     api.printStat = sstr.str();
@@ -159,11 +163,12 @@ int api_frame(AVCodecContext* ctx, const AVFrame* frame) {
 string get_job_info() {
     string info = "\"state\":\"" + api.jobStatus + "\"";
 
-    if (api.mediaInfo.length() > 0) {
-        info += ",\"info\":" + api.mediaInfo;
-    }
+    // if (api.mediaInfo.length() > 0) {
+    //     info += ",\"info\":" + api.mediaInfo;
+    // }
     if (api.printStat.length() > 0) {
-        info += ",\"report\":" + api.printStat;
+        // info += ",\"report\":" + api.printStat;
+        info += "," + api.printStat;
     }
 
     return "{" + info + "}";

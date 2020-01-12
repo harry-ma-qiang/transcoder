@@ -13,6 +13,9 @@
 
 using namespace std;
 
+string get_level_str(int level);
+string getLocalTimeNow(string fmt);
+
 string get_level_str(int level) {
     switch (level) {
         case AV_LOG_QUIET:
@@ -31,15 +34,6 @@ string get_level_str(int level) {
             return "fatal";
         case AV_LOG_PANIC:
             return "panic";
-//
-//        case api_LOG_ERROR:
-//            return "error";
-//        case api_LOG_WARN:
-//            return "warning";
-//        case api_LOG_INFO:
-//            return "info";
-//        case api_LOG_DEBUG:
-//            return "debug";
 
         default:
             return "";
@@ -67,7 +61,7 @@ void api_log(void *ptr, int level, const char *fmt, va_list vl) {
 //        log_level = api_LOG_ERROR;
 //    }
 //    level = AV_LOG_INFO;
-    if (level <= log_level) {
+    if (level <= log_level && level > AV_LOG_QUIET) {
         char str[4096];
         int n = vsnprintf(str, 4096, fmt, vl);
         str[n] = '\0';
@@ -83,44 +77,46 @@ void api_log(void *ptr, int level, const char *fmt, va_list vl) {
                 << ", \"Level\":\"" << get_level_str(level) << "\""
                 << ", \"Text\":\"" << str << "\" }";
 
-        pthread_mutex_lock(&api.k);
-        api.log.push(sstrLog.str());
-        pthread_mutex_unlock(&api.k);
+        // pthread_mutex_lock(&api.k);
+        // api.log.push(sstrLog.str());
+        // pthread_mutex_unlock(&api.k);
+		
+		cerr << sstrLog.str() << endl;
     }
 }
 
 int uploadLog() {
     int ret = 0;
 
-    if (api.log.size() > 0 && api.logfile.length() > 0) {
-        stringstream ss_txt;
-        pthread_mutex_lock(&api.k);
-        while (api.log.size()) {
-            ss_txt << api.log.front() << endl;
-            api.log.pop();
-        }
-        pthread_mutex_unlock(&api.k);
-
-        stringstream ss_header;
-        ss_header << "Content-Length: " << ss_txt.str().length() << "\r\n";
-
-        AVDictionary *options = NULL;
-        AVIOContext *io_ctx = NULL;
-        av_dict_set(&options, "timeout", "5000000", 0);
-        av_dict_set(&options, "method", "PUT", 0);
-        av_dict_set(&options, "headers", ss_header.str().c_str(), 0);
-
-//        av_log(NULL, api_LOG_DEBUG, "Upload log to [%s]", api.logfile.c_str());
-
-        ret = avio_open2(&io_ctx, api.logfile.c_str(), AVIO_FLAG_WRITE, NULL, &options);
-        if (ret >= 0) {
-            avio_write(io_ctx, (const unsigned char*) ss_txt.str().c_str(), ss_txt.str().length());
-            avio_close(io_ctx);
-        } else {
-//            av_log(NULL, api_LOG_ERROR, "Upload log error [%s][%d]", api.logfile.c_str(), ret);
-            ret = -1;
-        }
-    }
+//     if (api.log.size() > 0 && api.logfile.length() > 0) {
+//         stringstream ss_txt;
+//         pthread_mutex_lock(&api.k);
+//         while (api.log.size()) {
+//             ss_txt << api.log.front() << endl;
+//             api.log.pop();
+//         }
+//         pthread_mutex_unlock(&api.k);
+//
+//         stringstream ss_header;
+//         ss_header << "Content-Length: " << ss_txt.str().length() << "\r\n";
+//
+//         AVDictionary *options = NULL;
+//         AVIOContext *io_ctx = NULL;
+//         av_dict_set(&options, "timeout", "5000000", 0);
+//         av_dict_set(&options, "method", "PUT", 0);
+//         av_dict_set(&options, "headers", ss_header.str().c_str(), 0);
+//
+// //        av_log(NULL, api_LOG_DEBUG, "Upload log to [%s]", api.logfile.c_str());
+//
+//         ret = avio_open2(&io_ctx, api.logfile.c_str(), AVIO_FLAG_WRITE, NULL, &options);
+//         if (ret >= 0) {
+//             avio_write(io_ctx, (const unsigned char*) ss_txt.str().c_str(), ss_txt.str().length());
+//             avio_close(io_ctx);
+//         } else {
+// //            av_log(NULL, api_LOG_ERROR, "Upload log error [%s][%d]", api.logfile.c_str(), ret);
+//             ret = -1;
+//         }
+//     }
 
     return ret;
 }
