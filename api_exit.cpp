@@ -15,17 +15,17 @@ void *sync(void *ptr) {
     while (api.isGood) {
         usleep(10000);
         if (time(NULL) - now >= api.update) {
-            if (!api.config.empty()) {
-                loadJob(api.config);
-            }
+            // if (!api.config.empty()) {
+            //     loadJob(api.config +"/"+ api.jobId);
+            // }
 
             if (!api.status.empty()) {
-                updateStatus();
+                updateStatus(api.status +"/"+ api.jobId);
             }
 
-            if (api.log.size() > 0) {
-                uploadLog();
-            }
+            // if (api.log.size() > 0) {
+            //     uploadLog();
+            // }
 
             now = time(NULL);
         }
@@ -52,11 +52,11 @@ int api_exit(int ret, int received_sigterm, int init_done, int main_ret) {
 
     pthread_join(api.th_sync, NULL);
     
-//    av_log(NULL, api_LOG_DEBUG, "Job Done");
-    updateStatus();
-    uploadLog();
+    updateStatus(api.status +"/"+ api.jobId);
+    // uploadLog();
     
-    pthread_mutex_destroy(&api.k);
+    // pthread_mutex_destroy(&api.k);
+	av_log(NULL, AV_LOG_INFO, "Job Done");
 
     return ret;
 }

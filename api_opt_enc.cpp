@@ -40,8 +40,8 @@ int api_parse_options_encode(picojson::value v, int* p_argc, char*** p_argv) {
         }
     }
 
-    add_argv("-copyts", p_argc, p_argv);
-    add_argv("-start_at_zero", p_argc, p_argv);
+    // add_argv("-copyts", p_argc, p_argv);
+    // add_argv("-start_at_zero", p_argc, p_argv);
     
     if (input.rfind("udp")==0 || input.rfind("rtmp")==0 || input.rfind("zmq")==0 || input.rfind("http")==0) {
         add_argv("-timeout", p_argc, p_argv);
@@ -94,7 +94,7 @@ int api_parse_options_encode(picojson::value v, int* p_argc, char*** p_argv) {
 
     if (videoCodec == "h264") {
         add_argv("-c:v", p_argc, p_argv);
-        add_argv("api", p_argc, p_argv);
+        add_argv("libx264", p_argc, p_argv);
 
         xparams << ":qcomp=0.5"
                 << ":aq_mode=1"
@@ -124,11 +124,11 @@ int api_parse_options_encode(picojson::value v, int* p_argc, char*** p_argv) {
         add_argv("-x264-params", p_argc, p_argv);
         add_argv(xparams.str().c_str(), p_argc, p_argv);
 
-        add_argv("-bsf:v", p_argc, p_argv);
-        add_argv("h264_metadata=del_user_data=1", p_argc, p_argv);
+        // add_argv("-bsf:v", p_argc, p_argv);
+        // add_argv("h264_metadata=del_user_data=1", p_argc, p_argv);
     } else if (videoCodec == "hevc") {
         add_argv("-c:v", p_argc, p_argv);
-        add_argv("apihevc", p_argc, p_argv);
+        add_argv("libx265", p_argc, p_argv);
 
         xparams << ":qcomp=0.5"
                 << ":aq_mode=1"
@@ -197,7 +197,7 @@ int api_parse_options_encode(picojson::value v, int* p_argc, char*** p_argv) {
 
     string audioCodec = getJSONLowerString(v, "audioCodec", "");
     if (audioCodec.empty() || audioCodec == "aac") {
-        audioCodec = "libfdk_aac";
+        audioCodec = "aac";
     }
 
     add_argv("-c:a", p_argc, p_argv);
@@ -213,15 +213,15 @@ int api_parse_options_encode(picojson::value v, int* p_argc, char*** p_argv) {
         }
     }
 
-    add_argv("-copyts", p_argc, p_argv);
-    add_argv("-start_at_zero", p_argc, p_argv);
+    // add_argv("-copyts", p_argc, p_argv);
+    // add_argv("-start_at_zero", p_argc, p_argv);
 
     add_argv("-hide_banner", p_argc, p_argv);
     add_argv("-xerror", p_argc, p_argv);
     add_argv("-y", p_argc, p_argv);
 
-    add_argv("-fflags", p_argc, p_argv);
-    add_argv("bitexact", p_argc, p_argv);
+    // add_argv("-fflags", p_argc, p_argv);
+    // add_argv("bitexact", p_argc, p_argv);
     
     add_argv("-f", p_argc, p_argv);
     add_argv(format.c_str(), p_argc, p_argv);
@@ -233,8 +233,8 @@ int api_parse_options_encode(picojson::value v, int* p_argc, char*** p_argv) {
         add_argv("-hls_time", p_argc, p_argv);
         add_argv(getJSONLowerString(v, "hls_segment_duration", "3").c_str(), p_argc, p_argv);
         
-        add_argv("-hls_callback", p_argc, p_argv);
-        add_argv(getJSONLowerString(v, "hls_callback", "cb.bash").c_str(), p_argc, p_argv);
+        // add_argv("-hls_callback", p_argc, p_argv);
+        // add_argv(getJSONLowerString(v, "hls_callback", "cb.bash").c_str(), p_argc, p_argv);
 
 //        add_argv("-hls_playlist_type", p_argc, p_argv);
 //        add_argv("event", p_argc, p_argv);
@@ -257,6 +257,11 @@ int api_parse_options_encode(picojson::value v, int* p_argc, char*** p_argv) {
     }
     
     add_argv(output.c_str(), p_argc, p_argv);
+	
+	for (int i=0; i<*p_argc; i++) {
+		cerr << (*p_argv)[i] << " ";
+	}
+	cerr << endl;
 
     r = 0;
 
