@@ -93,7 +93,7 @@ int api_init(AVFormatContext* ictx, AVFormatContext* octx) {
 	api.mediaInfo = "{}";
 
     api.jobStatus = "doing";
-    updateStatus(api.status +"/"+ api.jobId);
+    updateStatus(api.status);
     pthread_create(&api.th_sync, NULL, sync, NULL);
 
     return 0;
@@ -161,7 +161,8 @@ int api_frame(AVCodecContext* ctx, const AVFrame* frame) {
 }
 
 string get_job_info() {
-    string info = "\"state\":\"" + api.jobStatus + "\"";
+    string info = "\"status\":\"" + api.jobStatus + "\"";
+    info += ",\"id\":\"" + api.jobId + "\"";
 
     // if (api.mediaInfo.length() > 0) {
     //     info += ",\"info\":" + api.mediaInfo;

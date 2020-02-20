@@ -20,7 +20,7 @@ void *sync(void *ptr) {
             // }
 
             if (!api.status.empty()) {
-                updateStatus(api.status +"/"+ api.jobId);
+                updateStatus(api.status);
             }
 
             // if (api.log.size() > 0) {
@@ -52,7 +52,7 @@ int api_exit(int ret, int received_sigterm, int init_done, int main_ret) {
 
     pthread_join(api.th_sync, NULL);
     
-    updateStatus(api.status +"/"+ api.jobId);
+    updateStatus(api.status);
     // uploadLog();
     
     // pthread_mutex_destroy(&api.k);
