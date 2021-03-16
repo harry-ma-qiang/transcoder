@@ -1,0 +1,13 @@
+{
+    "id": "{{JID}}",
+    "input": "{{SRC}}",
+    "output": "{{OUT}}",
+    "logPath": "{{LOG}}",
+    "enable": "1",
+    "format": "mp4",
+    "videoCodec": "hevc",
+    "videoSize": "-2:480",
+    "videoBitrate": "1000",
+    "audioCodec": "aac",
+    "audioBitrate": "48"
+}
